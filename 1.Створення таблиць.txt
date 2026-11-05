@@ -1,0 +1,53 @@
+CREATE TABLE readers (
+    reader_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    status VARCHAR(20) DEFAULT 'Active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE books (
+    book_id SERIAL PRIMARY KEY,
+    isbn VARCHAR(50),
+    title VARCHAR(150) NOT NULL,
+    author_id INT NOT NULL,
+    year INTEGER,
+    stock INT DEFAULT 1
+);
+
+CREATE TABLE lendings (
+    lending_id SERIAL PRIMARY KEY,
+    book_id INT REFERENCES books(book_id) ON DELETE CASCADE,
+    reader_id INT REFERENCES readers(reader_id) ON DELETE CASCADE,
+    lending_date DATE DEFAULT CURRENT_DATE,
+    due_date DATE NOT NULL,
+    return_date DATE
+);
+
+CREATE TABLE audit_log (
+    audit_id SERIAL PRIMARY KEY,
+    table_name VARCHAR(50),
+    operation VARCHAR(10),
+    record_id INT,
+    old_data JSONB,
+    new_data JSONB,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE books_versions (
+    version_id SERIAL PRIMARY KEY,
+    book_id INT,
+    version_number INT,
+    data JSONB,
+    valid_from TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    valid_to TIMESTAMP
+);
+
+CREATE TABLE scheduled_operations (
+    operation_id SERIAL PRIMARY KEY,
+    task_name VARCHAR(100),
+    status VARCHAR(20) DEFAULT 'Pending',
+    scheduled_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    executed_at TIMESTAMP
+);

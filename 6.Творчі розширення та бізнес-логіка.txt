@@ -1,0 +1,50 @@
+CREATE OR REPLACE FUNCTION extend_lending(
+    p_lending_id INTEGER,
+    p_days INTEGER DEFAULT 7
+)
+RETURNS TABLE (
+    success BOOLEAN,
+    message TEXT,
+    new_due_date DATE
+) AS $$
+DECLARE
+    v_reader_status VARCHAR(20);
+    v_overdue_count INTEGER;
+    v_current_due_date DATE;
+    v_reader_id INTEGER;
+BEGIN
+    SELECT r.status, l.due_date, l.reader_id
+    INTO v_reader_status, v_current_due_date, v_reader_id
+    FROM lendings l
+    JOIN readers r ON l.reader_id = r.reader_id
+    WHERE l.lending_id = p_lending_id AND l.return_date IS NULL;
+
+    IF NOT FOUND THEN
+        RETURN QUERY SELECT FALSE, 'Видача не знайдена або книга вже повернена'::TEXT, NULL::DATE;
+        RETURN;
+    END IF;
+
+    IF v_reader_status = 'Blocked' THEN
+        RETURN QUERY SELECT FALSE, 'Читач заблокований'::TEXT, NULL::DATE;
+        RETURN;
+    END IF;
+
+    SELECT COUNT(*)
+    INTO v_overdue_count
+    FROM lendings
+    WHERE reader_id = v_reader_id
+        AND return_date IS NULL
+        AND due_date < CURRENT_DATE;
+
+    IF v_overdue_count > 0 THEN
+        RETURN QUERY SELECT FALSE, 'У читача є прострочені книги'::TEXT, NULL::DATE;
+        RETURN;
+    END IF;
+
+    UPDATE lendings
+    SET due_date = due_date + p_days
+    WHERE lending_id = p_lending_id;
+
+    RETURN QUERY SELECT TRUE, 'Термін продовжено'::TEXT, (v_current_due_date + p_days)::DATE;
+END;
+$$ LANGUAGE plpgsql;

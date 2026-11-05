@@ -1,0 +1,16 @@
+BEGIN;
+
+INSERT INTO lendings (book_id, reader_id, due_date) 
+VALUES (5, 1, CURRENT_DATE + INTERVAL '14 days');
+
+SAVEPOINT sp_after_lending;
+
+UPDATE readers 
+SET status = 'Active' 
+WHERE reader_id = 1;
+
+COMMIT;
+
+-- У разі помилки:
+-- ROLLBACK TO SAVEPOINT sp_after_lending;
+-- ROLLBACK;

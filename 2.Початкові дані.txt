@@ -1,0 +1,12 @@
+INSERT INTO readers (first_name, last_name, email) VALUES
+('Максим', 'Бойко', 'maksym.boyko@example.com'),
+('Денис', 'Шевчук', 'denys.shevchuk@example.com'),
+('Вікторія', 'Кравченко', 'viktoria.kravchenko@example.com'),
+('Софія', 'Мельник', 'sofia.melnyk@example.com');
+
+INSERT INTO books (book_id, isbn, title, author_id) VALUES
+(5, '978-617-12-0005-9', 'Приблуда', 5),
+(2, '978-617-12-0002-8', 'Ворошиловград', 2),
+(3, '978-617-12-0003-5', 'Московіада', 3),
+(9, '978-966-03-4566-7', 'Земля', 6),
+(11, '978-966-03-4567-4', 'Царівна', 6);

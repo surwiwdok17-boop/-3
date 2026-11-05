@@ -1,0 +1,11 @@
+-- Перевірка та безпечне оновлення даних
+SELECT * FROM books WHERE book_id = 5;
+
+UPDATE books 
+SET stock = stock - 1 
+WHERE book_id = 5;
+
+-- Безпечне видалення з попередньою перевіркою
+DELETE FROM readers 
+WHERE reader_id = 999 
+  AND NOT EXISTS (SELECT 1 FROM lendings WHERE reader_id = 999);
